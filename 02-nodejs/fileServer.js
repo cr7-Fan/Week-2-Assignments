@@ -22,12 +22,43 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 
+// s-3 creating the endpoints
+function routeHandler1(req, res) {
+  // const fs = require('fs');
+
+  // Specify the path to the folder
+  const folderPath = '02-nodejs\files';
+  let result = [];
+  // Read the contents of the folder
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      // Handle error if the folder could not be read
+      console.error(err);
+      return;
+    }
+
+    // Iterate over the files array to access each file name
+    files.forEach((file) => {
+      // console.log(file);
+      result.push(file);
+    });
+  });
+  let finalResponse = {
+    key1: result
+  }
+  res.status(200).send(finalResponse);
+
+}
+app.get('/files', routeHandler1);
+
+
 // s-2  start the server
 function started() {
   console.log(`Example app listening on port ${port}`)
 }
 
 app.listen(port, started)
+
 
 
 
