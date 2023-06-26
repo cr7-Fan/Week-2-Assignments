@@ -16,10 +16,19 @@
 
     Testing the server - run `npm run test-fileServer` command in terminal
  */
+// s-1  make the necessary imports
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const app = express();
+
+// s-2  start the server
+function started() {
+  console.log(`Example app listening on port ${port}`)
+}
+
+app.listen(port, started)
+
 
 
 module.exports = app;
