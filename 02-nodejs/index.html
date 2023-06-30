@@ -1,0 +1,176 @@
+<head>
+    <title>
+        TODO app
+    </title>
+</head>
+<script>
+
+
+    function parsedResponse(data) {
+        console.log(data);
+        /* Explanation of how the callback-hell for the button 'Create New ToDo' is working:
+        -> Once the button is clicked by the user after entering the title and the description, the function onPressNewToDo() is called. 
+        -> In this func, we use the fetch lib to send the POST request (http://localhost:3000/todos) having the required json body to our backend. 
+        -> The backend processes the request and gives a response back to the frontend. 
+        -> Once this is done 'then' the func callback() is called. 
+        -> In callback(),  the resp parameter has the entire response (resp = json body + status code + headers). 
+        -> In callback(), we extract the json part of resp which is the main json response body using resp.json()
+        -> Once this is done 'then' parsedResponse() is called
+        -> in parsedResponse(), the data param has the extracted json response body (which in this case, is a JS object representing the added todo)
+        -> DOM Manipulation:
+        -> now we have JS or the json response body or data received from the backend in the console
+        -> we are creating a dynamic website using DOM Manipulation
+        -> a dynamic website uses JS or json response body or 'data' coming continuously from the backend to create html in the DOM
+        -> this 'data' is in the data param
+        ----------------------------------------------------------------------------------------------------------------------------------------------------------
+        */
+        let parentElement = document.getElementById("mainArea"); // getting the DOM
+        let childElement = document.createElement("div");
+        let grandChildElement1 = document.createElement("span");
+        grandChildElement1.innerHTML = data.title;
+
+        let grandChildElement2 = document.createElement("span");
+        grandChildElement2.innerHTML = data.description;
+
+        let grandChildElement3 = document.createElement("button");
+        grandChildElement3.innerHTML = "Delete";
+
+        childElement.appendChild(grandChildElement1);
+        childElement.appendChild(grandChildElement2);
+        childElement.appendChild(grandChildElement3);
+
+        // inserting the html created from the js (that was received from the backend and that was stored in the data param) in the dom
+        parentElement.appendChild(childElement); // insert it in the DOM
+
+
+
+
+
+    }
+
+    function callback(resp) {
+        resp.json().then(parsedResponse);
+
+    }
+    // function todosCallBack(data) {
+    //     console.log(data);
+    //     /* Dynamic Websites: Here we are using DOM Manipulation to create a dynamic website. 
+    //     A dynamic website is the one that fills HTML (or frontend) in its DOMs dynamically or continuously by using the data or the JS or the JSON object responses that it receives continuously (in the console)
+    //     from the backend (like as we scroll down Facebook, data is continuously coming from the backend and displayed on the DOM
+    //     i.e. displayed as HTML on the Frontend). 
+    //     Summary of DOM Manipulation: "A Dynamic Website uses JS to create HTML in the DOM"
+    //     Majority of the websites on the web are dynamic in nature. 
+    //      */
+    //     let parentElement = document.getElementById("mainArea"); 
+    //     // parentElement.innerHTML = JSON.stringify(data); // DOM Manipulation
+    //     // using JS from backend (stored in data) to create HTML and inserting this HTML in the DOM
+    //     for (let i = 0; i < data.length; i++) {
+    //         let childElement = document.createElement("div"); // create html
+    //         childElement.innerHTML = "something"; // create html
+    //         parentElement.appendChild(childElement); // insert it in the DOM
+    //     }
+
+    // }
+    // fs.readFile('todos.json', (err, data) => {
+    //     console.log(JSON.parse(data)); 
+
+    // })
+
+    // function callback2(res) {
+    //     res.json().then(todosCallBack);
+    // }
+
+    // function getExistingToDos() {
+    //     fetch("http://localhost:3000/todos", {
+    //         method: "GET"
+    //     }).then(callback2);
+
+
+    // }
+
+    function getExistingToDos() {
+        fetch('http://localhost:3000/todos', {
+            method: 'GET'
+        }).then((res) => {
+            res.json().then((data) => {
+                console.log(data);
+                let parentElement = document.getElementById("mainArea"); // getting the DOM
+                // parentElement.innerHTML = JSON.stringify(data); // DOM Manipulation
+                // using JS from backend (stored in data) to create HTML and inserting this HTML in the DOM
+                for (let i = 0; i < data.length; i++) {
+                    let childElement = document.createElement("div"); // create html
+
+                    let grandChildElement1 = document.createElement("span");
+                    grandChildElement1.innerHTML = data[i].title;
+
+                    let grandChildElement2 = document.createElement("span");
+                    grandChildElement2.innerHTML = data[i].description;
+
+                    let grandChildElement3 = document.createElement("button");
+                    grandChildElement3.innerHTML = "Delete";
+                    grandChildElement3.setAttribute("onclick", "deleteTodo(" + data[i].id + ")");
+
+                    childElement.appendChild(grandChildElement1);
+                    childElement.appendChild(grandChildElement2);
+                    childElement.appendChild(grandChildElement3);
+
+
+
+
+                    parentElement.appendChild(childElement); // insert it in the DOM
+                }
+
+            })
+
+        });
+    }
+
+    getExistingToDos(); /* when the page loads, the first function that is 
+    called is getExistingToDos(), which displays all the existing todos
+    in the database file (todos.json) */
+    function onPressNewToDo() {
+        //----------------------------------------------------
+        // DOM Manipulation
+        let input_title = document.getElementById("title").value; // accessing the input data by the user in the title form (we are using the id of the title form which is 'title')
+        let input_description = document.getElementById("description").value; // accessing the input user data in the description form
+        //-------------------------------------------------
+        fetch("http://localhost:3000/todos", {
+            method: "POST",
+            body: JSON.stringify({
+                title: input_title,
+                description: input_description
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then(callback);
+
+    }
+    function deleteTodo(id) {
+        fetch("http://localhost:3000/todos/" + id, {
+            method: "DELETE"
+        }).then((resp) => {
+            resp.json().then((data) => {
+                console.log(data);
+            })
+        })
+    }
+
+</script>
+
+<body>
+    Todo title
+    <input type="text" id="title"></input>
+    <br><br>
+    Todo description
+    <input type="text" id="description"></input>
+    <br><br>
+
+    <button onclick="onPressNewToDo()"> Create New ToDo</button>
+
+
+    <div id="mainArea">
+
+
+    </div>
+</body>
